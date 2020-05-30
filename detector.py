@@ -98,7 +98,7 @@ class GoalDetector():
         closest_center = None
         for sem_cls, corners, conf in preds[0]:
             if SUN_TO_HAB[sem_cls] == goal_class:
-                center = np.mean(corners, axis=0)[[0, 2]
+                center = np.mean(corners, axis=0)[[0, 2]]
                 dist = np.linalg.norm(center)
                 if dist < min_dist:
                     min_dist = dist
