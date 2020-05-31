@@ -36,8 +36,8 @@ from habitat_baselines.slambased.reprojection import (
 )
 from habitat_baselines.slambased.utils import generate_2dgrid
 
-#GOAL_SENSOR_UUID = "pointgoal_with_gps_compass"
-GOAL_SENSOR_UUID = "objectgoal"
+GOAL_SENSOR_UUID = "pointgoal_with_gps_compass"
+#GOAL_SENSOR_UUID = "objectgoal"
 
 def download(url, filename):
     with open(filename, "wb") as f:
@@ -208,7 +208,7 @@ class ORBSLAM2Agent(RandomAgent):
         self.timestep = 0.1
         self.timing = False
         self.reset()
-        print('self', self, dir(self))
+        # print('self', self, dir(self))
         for attr_name in dir(self):
             if '__' not in attr_name:
                 print(attr_name, getattr(self, attr_name), type(getattr(self, attr_name)))
@@ -411,13 +411,21 @@ class ORBSLAM2Agent(RandomAgent):
         """ ID mappings"""
         obj_to_id = {'chair': 0, 'table': 1, 'picture': 2, 'cabinet': 3, 'cushion': 4, 'sofa': 5, 'bed': 6, 'chest_of_drawers': 7, 'plant': 8, 'sink': 9, 'toilet': 10, 'stool': 11, 'towel': 12, 'tv_monitor': 13, 'shower': 14, 'bathtub': 15, 'counter': 16, 'fireplace': 17, 'gym_equipment': 18, 'seating': 19, 'clothes': 20}
         id_to_obj = {obj_to_id[key]: key for key in obj_to_id}
-        self.offset_to_goal = (
             # [distance to goal in metres, angle to goal in radians]
-            torch.from_numpy(np.array([1.0,0]))#observation[GOAL_SENSOR_UUID])
-            .float()
-            .to(self.device)
-        )
-        print('class observation from goal', id_to_obj[observation[GOAL_SENSOR_UUID][0]])
+        if GOAL_SENSOR_UUID == 'objectnav':
+            self.offset_to_goal = (
+                    torch.from_numpy(np.array([1.0,3]))#observation[GOAL_SENSOR_UUID])
+                    .float()
+                    .to(self.device)
+            )
+            print('class observation from goal', id_to_obj[observation[GOAL_SENSOR_UUID][0]])
+
+        else:
+            self.offset_to_goal = (
+                    torch.from_numpy(observation[GOAL_SENSOR_UUID])
+                    .float()
+                    .to(self.device)
+            )
         print('substituted observation from goal', self.offset_to_goal)
         self.estimatedGoalPos2D = habitat_goalpos_to_mapgoal_pos(
             self.offset_to_goal,
@@ -438,7 +446,9 @@ class ORBSLAM2Agent(RandomAgent):
         ]
         for attr in log_attrs:
             print(attr, getattr(self, attr))
-        print('num obs', self.map2DObstacles.sum())
+        print('num obstacles:', self.map2DObstacles.sum())
+        if self.map2DObstacles.sum() > 0:
+            np.savetxt('obstacle_map_' + str(self.map2DObstacles.sum()) + '.csv', self.map2DObstacles[0,0].cpu().numpy())
         return
 
     def rgb_d_from_observation(self, habitat_observation):
@@ -623,8 +633,14 @@ def main():
     parser.add_argument(
         "--task-config", type=str, default="tasks/pointnav_rgbd.yaml"
     )
+    parser.add_argument(
+        "--goal-sensor-uuid", type=str, default="pointgoal_with_gps_compass"
+    )
     args = parser.parse_args()
 
+    global GOAL_SENSOR_UUID
+    GOAL_SENSOR_UUID = args.goal_sensor_uuid
+    
     config = get_config()
     agent_config = cfg_baseline()
     agent_config.defrost()
@@ -641,6 +657,8 @@ def main():
         agent = ORBSLAM2MonodepthAgent(config.ORBSLAM2)
     else:
         raise ValueError(args.agent_type, "is unknown type of agent")
+    
+    
     benchmark = habitat.Benchmark(args.task_config)
     metrics = benchmark.evaluate(agent)
     for k, v in metrics.items():
