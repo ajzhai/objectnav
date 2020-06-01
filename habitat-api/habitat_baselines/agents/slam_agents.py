@@ -257,6 +257,8 @@ class ORBSLAM2Agent(RandomAgent):
             print("Warning!!!! ORBSLAM processing frame error")
             self.tracking_is_OK = False
         if not self.tracking_is_OK:
+            print("\n\n\n\nRESETTING MYSELF BC TRACKING NOT OKAY\n\n\n\n")
+            print("SLAM TRACKING STATE:", self.slam.get_tracking_state())
             self.reset()
         t = time.time()
         self.set_offset_to_goal(habitat_observation)
@@ -412,7 +414,7 @@ class ORBSLAM2Agent(RandomAgent):
         obj_to_id = {'chair': 0, 'table': 1, 'picture': 2, 'cabinet': 3, 'cushion': 4, 'sofa': 5, 'bed': 6, 'chest_of_drawers': 7, 'plant': 8, 'sink': 9, 'toilet': 10, 'stool': 11, 'towel': 12, 'tv_monitor': 13, 'shower': 14, 'bathtub': 15, 'counter': 16, 'fireplace': 17, 'gym_equipment': 18, 'seating': 19, 'clothes': 20}
         id_to_obj = {obj_to_id[key]: key for key in obj_to_id}
             # [distance to goal in metres, angle to goal in radians]
-        if GOAL_SENSOR_UUID == 'objectnav':
+        if GOAL_SENSOR_UUID == 'objectgoal':
             self.offset_to_goal = (
                     torch.from_numpy(np.array([1.0,3]))#observation[GOAL_SENSOR_UUID])
                     .float()

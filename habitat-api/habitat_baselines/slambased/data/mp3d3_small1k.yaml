@@ -5,11 +5,19 @@
 #--------------------------------------------------------------------------------------------
 
 # Camera calibration and distortion parameters (OpenCV)
-#For resolution 256x256, FOV 90 deg
-Camera.fx: 128.0
-Camera.fy: 128.0
-Camera.cx: 127.0
-Camera.cy: 127.0
+# Old:For resolution 256x256, FOV 90 deg
+# Camera.fx: 128.0
+# Camera.fy: 128.0
+# Camera.cx: 127.0
+# Camera.cy: 127.0
+# New:For resolution 640x480, FOV 79 deg
+# tan(79/2) = 0.8243
+# fx = cx / tan(fov/2)
+Camera.fx: 388.2
+Camera.fy: 291.1
+Camera.cx: 320.0
+Camera.cy: 240.0
+
 
 
 Camera.k1: 0.0
@@ -38,7 +46,7 @@ DepthMapFactor: 1.0
 #--------------------------------------------------------------------------------------------
 
 # ORB Extractor: Number of features per image
-ORBextractor.nFeatures: 1000
+ORBextractor.nFeatures: 2000
 
 # ORB Extractor: Scale factor between levels in the scale pyramid
 ORBextractor.scaleFactor: 1.2
