@@ -35,8 +35,8 @@ Camera.bf: 50.0
 Camera.RGB: 1
 
 # Close/Far threshold. Baseline times.
-#ThDepth: 40.0
-ThDepth: 70.0
+ThDepth: 40.0
+#ThDepth: 70.0
 
 # Deptmap values factor
 DepthMapFactor: 1.0
