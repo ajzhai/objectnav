@@ -7,7 +7,11 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torch
 
-VN_DIR = './votenet'  # votenet directory
+
+import pathlib
+my_dir = pathlib.Path(__file__).parent.absolute()
+
+VN_DIR = os.path.join(my_dir, './votenet')  # votenet directory
 sys.path.append(os.path.join(VN_DIR, 'utils'))
 sys.path.append(os.path.join(VN_DIR, 'models'))
 sys.path.append(os.path.join(VN_DIR, 'sunrgbd'))
