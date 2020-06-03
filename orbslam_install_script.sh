@@ -1,7 +1,7 @@
 #!/bin/bash
 
 CURRENT_DIR=$(pwd)
-MAINDIR=$(pwd)/3rdparty
+MAINDIR=$(pwd)/3rdparty_habitat
 CONDA_ENV_NAME=$CONDA_DEFAULT_ENV
 
 # Ensure this is before anaconda's libs
@@ -20,7 +20,7 @@ cd ${MAINDIR}
 # source activate ${CONDA_ENV_NAME}
 
 # These should be already in conda.
-# conda install opencv -y
+# conda install opencv boost -y
 # conda install pytorch torchvision -c pytorch -y
 # conda install -c conda-forge imageio -y
 # conda install ffmpeg -c conda-forge -y
@@ -93,9 +93,11 @@ cmake .. -DPYTHON_INCLUDE_DIR=$(python -c "from distutils.sysconfig import get_p
 make
 make install
 
-# TODO: also need to change the CMakeLists.txt for ORB_SLAM2-PythonBindings, change boost to python3.6
-# TODO: also have to copy the thirdparty g2o, dbow2 .so files to site-packages
-# TODO: also change the install location to conda env site packages
+# TODO: make sure you have boost for conda, and optionally include the boost path (/home/ubuntu/anaconda3/envs/habitat_p36/include/boost) into the -DCMAKE_INCLUDE_PATH argument in the cmake
+# TODO: make sure you have opencv version 2 or 3
+# TODO: also need to change the CMakeLists.txt for ORB_SLAM2-PythonBindings, change boost required component to python36, not python-py36
+# TODO: also have to copy the thirdparty g2o, dbow2 .so files to site-packages if required
+# TODO: may need to change the <pyboostcvconverter/pyboostcvconverter.hpp> to "pyboostcvconverter/pyboostcvconverter.hpp"
 
 # Copy the ORB Vocabulary file
 cp ${MAINDIR}/ORB_SLAM2/Vocabulary/ORBvoc.txt ${CURRENT_DIR}/data/
