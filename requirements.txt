@@ -1,0 +1,10 @@
+plyfile
+trimesh
+torch
+moviepy
+opencv-python
+Pillow
+requests
+numpy
+matplotlib
+# plus all the other stuff required for habitat
