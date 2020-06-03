@@ -7,7 +7,6 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torch
 
-
 import pathlib
 my_dir = pathlib.Path(__file__).parent.absolute()
 
@@ -42,12 +41,13 @@ SUN_TO_HAB = {0:6, 1:1, 2:5, 3:0, 4:10, 5:1, 6:7, 7:1, 8:3, 9:15}
 
 class GoalDetector():
     """Habitat ObjectNav goal object detector."""
-    def __init__(self):
+    def __init__(self, device=device):
+        self.device = device
         self.net = MODEL.VoteNet(num_proposal=256, input_feature_dim=1, vote_factor=1,
                                  sampling='seed_fps', num_class=DC.num_class,
                                  num_heading_bin=DC.num_heading_bin,
                                  num_size_cluster=DC.num_size_cluster,
-                                 mean_size_arr=DC.mean_size_arr).to(device)
+                                 mean_size_arr=DC.mean_size_arr).to(self.device)
         checkpoint = torch.load(checkpoint_path)
         self.net.load_state_dict(checkpoint['model_state_dict'])
         self.net.eval()
@@ -78,7 +78,7 @@ class GoalDetector():
         (semantic class, bbox corners, objectness).
         """
         pc = self.depth_to_pc(depth)
-        inputs = {'point_clouds': torch.from_numpy(pc).to(device)}
+        inputs = {'point_clouds': torch.from_numpy(pc).to(self.device)}
         tic = time.time()
         with torch.no_grad():
             end_points = self.net(inputs)
