@@ -6,6 +6,7 @@
 
 import numpy as np
 import matplotlib.pyplot as plt
+import os
 
 import argparse
 import quaternion
@@ -16,7 +17,6 @@ import habitat
 
 import gym
 from gym.spaces import Discrete, Box, Tuple
-from slam_agent import ORBSLAM2Agent, config
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
@@ -220,11 +220,13 @@ GOAL_SENSOR_UUID = args.goal_sensor_uuid
 agent = None
 
 # In[6]:
+if os.environ.get("TRACK_CONFIG_FILE") is not None:
+    args.task_config = os.environ["TRACK_CONFIG_FILE"]
 
 
 task_config = habitat.get_config(config_paths=args.task_config)
 env = habitat.Env(config=task_config)
-
+env.episodes = [env.episodes[0]]
 
 # In[7]:
 
@@ -308,8 +310,8 @@ rl_env = LocalNav(agent)
 state_dim = 256
 action_dim = 3
 render = False
-solved_reward = -30         # stop training if avg_reward > solved_reward
-log_interval = 1           # print avg reward in the interval
+solved_reward = -100         # stop training if avg_reward > solved_reward
+log_interval = 5           # print avg reward in the interval
 max_episodes = 50000        # max training episodes
 max_timesteps = 300         # max timesteps in one episode
 n_latent_var = 64           # number of variables in hidden layer
@@ -337,6 +339,7 @@ timestep = 0
 
 # training loop
 for i_episode in range(1, max_episodes+1):
+    print("trying to reset rl env")
     state = rl_env.reset()
     print("successfully reset rl env")
     for t in range(max_timesteps):
