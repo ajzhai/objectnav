@@ -170,9 +170,8 @@ class PPO:
         # Optimize policy for K epochs:
         for _ in range(self.K_epochs):
             # Evaluating old actions and values :
-            logprobs, state_values, dist_entropy = self.policy.evaluate(old_coord_states, 
-                                                                        old_map_states, 
-                                                                        old_actions)
+            logprobs, state_values, dist_entropy = self.policy.evaluate(
+                old_coord_states, old_map_states, old_actions)
             
             # Finding the ratio (pi_theta / pi_theta__old):
             ratios = torch.exp(logprobs - old_logprobs.detach())
@@ -187,6 +186,7 @@ class PPO:
             self.optimizer.zero_grad()
             loss.mean().backward()
             self.optimizer.step()
+            print("Mean loss is:", loss.mean().item())
         
         # Copy new weights into old policy:
         self.policy_old.load_state_dict(self.policy.state_dict())
@@ -316,7 +316,7 @@ max_episodes = 50000        # max training episodes
 max_timesteps = 300         # max timesteps in one episode
 n_latent_var = 64           # number of variables in hidden layer
 update_timestep = 128       # update policy every n timesteps
-lr = 0.002
+lr = 0.02
 betas = (0.9, 0.999)
 gamma = 0.99                # discount factor
 K_epochs = 4                # update policy for K epochs
@@ -339,7 +339,7 @@ timestep = 0
 
 # training loop
 for i_episode in range(1, max_episodes+1):
-    print("trying to reset rl env")
+    print("\n\ntrying to reset rl env")
     state = rl_env.reset()
     print("successfully reset rl env")
     for t in range(max_timesteps):
@@ -347,7 +347,8 @@ for i_episode in range(1, max_episodes+1):
 
         # Running policy_old:
         action = ppo.policy_old.act(state, memory)
-        print("chose action:", action, "at time:", t, "for episode:", i_episode)
+        print("chose action:", action, "at time:", t, "for episode:", i_episode,
+              end='\t\t')
         state, reward, done, _ = rl_env.step(action)
 
         # Saving reward and is_terminal:
