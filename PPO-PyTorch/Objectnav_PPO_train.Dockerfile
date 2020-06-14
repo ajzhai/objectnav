@@ -1,7 +1,7 @@
 FROM fairembodied/habitat-challenge:testing_2020_habitat_base_docker
 
 # install dependencies in the habitat conda environment
-RUN /bin/bash -c ". activate habitat; pip install torch"
+RUN /bin/bash -c ". activate habitat; conda install pytorch==1.1.0 torchvision==0.3.0 cudatoolkit=10.0 -c pytorch -y"
 
 ADD ppo_local_planner_no_slam.py ppo_local_planner_no_slam.py
 ADD train.sh train.sh

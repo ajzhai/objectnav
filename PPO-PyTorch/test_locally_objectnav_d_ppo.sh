@@ -19,7 +19,7 @@ case $key in
 esac
 done
 
-docker run -v $(pwd)/data:/data \
+nvidia-docker run -v $(pwd)/data:/data \
     --runtime=nvidia \
     -e "TRACK_CONFIG_FILE=challenge_objectnav2020.local.rgbd.yaml" \
     ${DOCKER_NAME}\
